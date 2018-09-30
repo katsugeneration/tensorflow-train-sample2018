@@ -36,12 +36,17 @@ class MnistClassifier(object):
             v += l.variables
         return v
 
-    def call(self, inputs, labels=None):
+    def call(self, inputs, is_train=True):
         outputs = tf.reshape(inputs, (-1, 28*28))
         outputs = self.dense1(outputs)
         outputs = self.dense2(outputs)
+        if is_train:
+            outputs = tf.nn.dropout(outputs, 0.5)
+        return outputs
+
+    def loss(self, logits, labels):
         labels = tf.reshape(tf.one_hot(labels, 10), (-1, 10))
-        loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=outputs, labels=labels)
+        loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels)
         loss = tf.reduce_mean(loss)
         return loss
 
@@ -50,6 +55,10 @@ class MnistClassifier(object):
         clipped_grads = [(tf.clip_by_value(g, -clipped_value, clipped_value), v) for g, v in grads]
         train_op = self.optimizer.apply_gradients(clipped_grads)
         return train_op
+
+    def predict(self, logits):
+        _, indices = tf.nn.top_k(logits, 1, sorted=False)
+        return indices
 
     def __call__(self, inputs, **kwargs):
         with tf.variable_scope("mnist_classifier"):

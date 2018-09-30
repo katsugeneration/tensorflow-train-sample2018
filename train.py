@@ -46,8 +46,10 @@ def main():
     # build train operation
     global_step = tf.train.get_or_create_global_step()
     model = MnistClassifier(hidden_size=300, classes=10)
-    loss = model(inputs, labels=labels)
+    logits = model(inputs)
+    loss = model.loss(logits, labels)
     train_op = model.optimize(loss)
+    predict = model.predict(logits)
     with tf.control_dependencies([train_op]):
         train_op = tf.assign_add(global_step, 1)
 
@@ -55,7 +57,6 @@ def main():
     tf.summary.scalar('global_step', global_step)
     tf.summary.scalar('loss', loss)
     tf.summary.image('image', inputs)
-    tf.summary.scalar('labels', labels[0][0])
 
     # create saver
     scaffold = tf.train.Scaffold(
@@ -80,7 +81,9 @@ def main():
 
     with session:
         while not session.should_stop():
-            session.run([train_op])
+            _, l, p = session.run([train_op, labels, predict])
+            print(l)
+            print(p)
 
 
 main()
