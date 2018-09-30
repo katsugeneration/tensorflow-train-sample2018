@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class MnistClassifier(object):
     def __init__(self,
-                 hidden_size=300,
+                 hidden_size=512,
                  classes=2,
                  lr=0.001):
         self.hidden_size = hidden_size
@@ -37,11 +37,11 @@ class MnistClassifier(object):
         return v
 
     def call(self, inputs, is_train=True):
-        outputs = tf.reshape(inputs, (-1, 28*28))
+        outputs = tf.reshape(inputs, (-1, 28*28)) / 255.0
         outputs = self.dense1(outputs)
-        outputs = self.dense2(outputs)
         if is_train:
-            outputs = tf.nn.dropout(outputs, 0.5)
+            outputs = tf.nn.dropout(outputs, 0.2)
+        outputs = self.dense2(outputs)
         return outputs
 
     def loss(self, logits, labels):
