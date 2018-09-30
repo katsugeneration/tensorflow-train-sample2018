@@ -1,5 +1,5 @@
 import tensorflow as tf
-from mnist_classifier import MnistClassifier 
+from mnist_classifier import MnistClassifier
 import mnist_loader
 
 
