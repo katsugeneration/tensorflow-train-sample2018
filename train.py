@@ -50,12 +50,14 @@ def main():
     loss = model.loss(logits, labels)
     train_op = model.optimize(loss)
     predict = model.predict(logits)
+    accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(predict, tf.uint8), labels), tf.float32))
     with tf.control_dependencies([train_op]):
         train_op = tf.assign_add(global_step, 1)
 
     # logging for tensorboard
     tf.summary.scalar('global_step', global_step)
     tf.summary.scalar('loss', loss)
+    tf.summary.scalar('accuracy', accuracy)
     tf.summary.image('image', inputs)
 
     # create saver
@@ -67,7 +69,11 @@ def main():
     # create hooks
     hooks = []
     tf.logging.set_verbosity(tf.logging.INFO)
-    hooks.append(tf.train.LoggingTensorHook({"global_step": global_step, "loss": loss}, every_n_iter=100))
+    metrics = {
+        "global_step": global_step,
+        "loss": loss,
+        "accuracy": accuracy}
+    hooks.append(tf.train.LoggingTensorHook(metrics, every_n_iter=100))
     hooks.append(tf.train.NanTensorHook(loss))
     if max_steps:
         hooks.append(tf.train.StopAtStepHook(last_step=max_steps))
@@ -81,9 +87,7 @@ def main():
 
     with session:
         while not session.should_stop():
-            _, l, p = session.run([train_op, labels, predict])
-            print(l)
-            print(p)
+            session.run([train_op, labels, predict])
 
 
 main()

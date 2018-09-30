@@ -22,7 +22,7 @@ class MnistClassifier(object):
 
         self.dense2 = tf.keras.layers.Dense(
                                 units=self.classes,
-                                activation=tf.nn.relu,
+                                activation=None,
                                 use_bias=False,
                                 kernel_initializer=tf.initializers.random_normal())
         self._layers.append(self.dense2)
