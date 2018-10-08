@@ -20,10 +20,10 @@ def main():
         'keep_checkpoint_every_n_hours', 1,
         'checkpoint create ')
     flags.DEFINE_integer(
-        'max_steps', 1000,
+        'max_steps', 10000,
         'max trainig step')
     flags.DEFINE_integer(
-        'save_checkpoint_steps', 100,
+        'save_checkpoint_steps', 1000,
         'save checkpoint step')
     flags.DEFINE_integer(
         'batch_size', 128,
