@@ -15,16 +15,12 @@ class MnistClassifier(object):
     def build(self):
         self.dense1 = tf.keras.layers.Dense(
                                 units=self.hidden_size,
-                                activation=tf.nn.relu,
-                                use_bias=False,
-                                kernel_initializer=tf.initializers.random_normal())
+                                activation=tf.nn.relu)
         self._layers.append(self.dense1)
 
         self.dense2 = tf.keras.layers.Dense(
                                 units=self.classes,
-                                activation=None,
-                                use_bias=False,
-                                kernel_initializer=tf.initializers.random_normal())
+                                activation=None)
         self._layers.append(self.dense2)
 
         self.built = True
@@ -45,8 +41,8 @@ class MnistClassifier(object):
         return outputs
 
     def loss(self, logits, labels):
-        labels = tf.reshape(tf.one_hot(labels, 10), (-1, 10))
-        loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=labels)
+        labels = tf.reshape(tf.cast(labels, tf.int32), (-1, ))
+        loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)
         loss = tf.reduce_mean(loss)
         return loss
 
